@@ -1,0 +1,98 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+}
+
+.registration-main-div {
+  background-color: #ffffff;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  align-items: center;
+  padding-top: 70px;
+}
+
+.logo-image-div {
+  width: 100%;
+  height: 15vh;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  padding-bottom: 30px;
+}
+
+.logo-image {
+  width: 30vw;
+  height: 15vh;
+  padding-bottom: 30px;
+}
+
+.baby-hug-border {
+  width: 65vw;
+  height: 60vh;
+  border: 1px solid #d3d3d3;
+  border-radius: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+}
+
+.baby-hug {
+  height: 60vh;
+  width: 100%;
+}
+
+.image-div {
+  width: 50%;
+}
+
+.input-phone-email {
+  height: 5vh;
+  width: 25vw;
+  border: 1px solid #d3d3d3;
+  border-radius: 20px;
+  display: flex;
+  padding-left: 10px;
+}
+
+.registration-check-box {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.check-box-gape {
+  padding-left: 10px;
+}
+
+.continue-btn {
+  height: 5vh;
+  width: 25vw;
+  border-radius: 20px;
+  border: 1px solid #d3d3d3;
+  color: rgb(247, 244, 244);
+  background-color: rgb(243, 70, 70);
+  cursor: pointer;
+}
+
+.active-btn{
+  background-color: rgb(244, 113, 113);
+  cursor: pointer;
+}
+
+.continue-btn2 {
+  height: 5vh;
+  width: 25vw;
+  border-radius: 20px;
+  border: 1px solid #d3d3d3;
+  color: rgb(247, 244, 244);
+  background-color: rgb(243, 70, 70);
+  cursor: not-allowed;
+}
+
+.continue-btn .continue-btn2 .active-btn :hover {
+  background-color: rgb(223, 19, 19);
+}

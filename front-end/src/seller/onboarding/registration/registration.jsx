@@ -2,12 +2,30 @@ import React, { useState } from "react";
 import logo from "../../../assets/companylogoContact.webp";
 import babyHug from "../../../assets/motherandchildContact.webp";
 import "./regstration.css";
+import { useNavigate } from "react-router-dom";
+import axois from "axios";
+
 
 const Registration=()=> {
   const [btnactive, setbtnactive] = useState(false);
+  const [phoneEmail, setPhoneEmail] = useState("");
+
+  const navigate = useNavigate();
+
+  const sendOTP =() => {
+    try {
+
+      const response = await axois.post(
+
+      )
+    } catch (error) {      console.error("Error sending OTP:", error);
+    };
+  }
+
   const activebtn = () => {
     setbtnactive(!btnactive);
   };
+
   return (
     <div className="registration-main-div">
       <div className="logo-image-div">
@@ -27,10 +45,14 @@ const Registration=()=> {
             className="input-phone-email"
             type="text"
             placeholder="Enter mobile number or email address"
+            value={phoneEmail}
+            onChange={(e) => setPhoneEmail(e.target.value)}
           />
 
           <div className="registration-check-box">
-            <input type="checkbox" onClick={activebtn} />
+            <input type="checkbox" 
+            onChange={(e) => setbtnactive(e.target.checked)}
+            />
             <p className="check-box-gape">
               I agree to the Terms & Conditions and Privacy Policy
             </p>

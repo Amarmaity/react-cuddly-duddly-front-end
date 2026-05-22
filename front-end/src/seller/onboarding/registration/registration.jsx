@@ -12,7 +12,7 @@ const Registration=()=> {
 
   const navigate = useNavigate();
 
-  const sendOTP =() => {
+  const sendOTP = async() => {
     try {
 
       const response = await axois.post(

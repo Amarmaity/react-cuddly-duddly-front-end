@@ -13,9 +13,9 @@ class RegisterSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
     user_type = serializers.ChoiceField(
-        choices=["admin", "seller", "tester", "operations"]
+        choices=["admin", "seller", "tester", "operations", "super user"]
     )
-    permissions_level = serializers.CharField(required=False, default="admin")
+    permissions_level = serializers.CharField(required=False, default="super user")
 
     def validate(self, data):
         if User.objects.filter(mobile=data["mobile"]).exists():

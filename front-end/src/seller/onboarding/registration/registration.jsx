@@ -3,7 +3,7 @@ import logo from "../../../assets/companylogoContact.webp";
 import babyHug from "../../../assets/motherandchildContact.webp";
 import "./regstration.css";
 import { useNavigate } from "react-router-dom";
-import axois from "axios";
+// import axois from "axios";
 
 
 const Registration=()=> {

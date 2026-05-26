@@ -10,6 +10,8 @@ const AdminRegistration = () => {
     password: "",
     confirm_password: "",
   });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // ================= VALIDATION =================
 
@@ -31,6 +33,42 @@ const AdminRegistration = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (formData.full_name.trim().length < 3 && formData.full_name === "") {
+      setError("Full name must be at last 3 characters");
+      return;
+    }
+
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valide email");
+      return;
+    }
+
+    if (!phoneRegex.test(formData.mobile)) {
+      setError("Please enter a valide number");
+      return;
+    }
+
+    if (formData.user_type.trim() === "") {
+      setError("please select user type");
+      return;
+    }
+
+    if (!passwordRegex.test(formData.password)) {
+      setError(
+        "Password must contain uppercase, lowercase, number & special character",
+      );
+      return;
+    }
+
+    if (formData.password != formData.confirm_password) {
+      setError("Password do not match");
+      return;
+    }
+
+    setSuccess("Registration Successful");
   };
 
   return (
@@ -133,6 +171,13 @@ const AdminRegistration = () => {
               Register
             </button>
           </form>
+          <p className="error-message" style={{ color: "red" }}>
+            {error}
+          </p>
+
+          <p className="success-message" style={{ color: "green" }}>
+            {success}
+          </p>
         </div>
       </div>
     </div>

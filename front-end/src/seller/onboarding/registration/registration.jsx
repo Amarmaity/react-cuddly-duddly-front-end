@@ -5,76 +5,58 @@ import "./regstration.css";
 // import { useNavigate } from "react-router-dom";
 // import axois from "axios"; ?
 
-
-const Registration=()=> {
+const Registration = () => {
   const [btnactive, setbtnactive] = useState(false);
   const [phoneEmail, setPhoneEmail] = useState("");
-  const [error, setError] = useState(""); 
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // const navigate = useNavigate();
 
-const handleValidation = (value) => {
+  const handleValidation = (value) => {
+    setError("");
 
-  setError("");
+    const phoneRegex = /^\d{10}$/;
 
-  const phoneRegex = /^\d{10}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const emailRegex =
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // PHONE CHECK
 
-  // PHONE CHECK
+    if (/^\d+$/.test(value)) {
+      if (phoneRegex.test(value)) {
+        setPhoneEmail(value);
 
-  if (/^\d+$/.test(value)) {
-
-    if (phoneRegex.test(value)) {
-
-      setPhoneEmail(value);
-
-      sendOTP(value);
-
-    } else {
-
-      setError(
-        "Please enter a valid 10-digit phone number."
-      );
-
+        sendOTP(value);
+      } else {
+        setError("Please enter a valid 10-digit phone number.");
+      }
     }
 
-  }
+    // EMAIL CHECK
+    else {
+      if (emailRegex.test(value)) {
+        setPhoneEmail(value);
 
-  // EMAIL CHECK
-
-  else {
-
-    if (emailRegex.test(value)) {
-
-      setPhoneEmail(value);
-
-      sendOTP(value);
-
-    } else {
-
-      setError(
-        "Please enter a valid email address."
-      );
-
+        sendOTP(value);
+      } else {
+        setError("Please enter a valid email address.");
+      }
     }
+  };
 
-  }
-
-};
-
-  const sendOTP = async(value) => {
+  const sendOTP = async (value) => {
     try {
-
-      const response = await axois.post(
-
-      )
-    } catch (error) {      console.error("Error sending OTP:", error);
-    };
-  }
-
- 
+      const response = await axois.post("#", {
+        phoneEmail: value,
+      });
+      setSuccess("OTP sent successfully!");
+      setError("");
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      setError("Failed to send OTP");
+      setSuccess("");
+    }
+  };
 
   return (
     <div className="registration-main-div">
@@ -98,11 +80,11 @@ const handleValidation = (value) => {
             value={phoneEmail}
             onChange={(e) => setPhoneEmail(e.target.value)}
           />
-                
 
           <div className="registration-check-box">
-            <input type="checkbox" 
-            onChange={(e) => setbtnactive(e.target.checked)}
+            <input
+              type="checkbox"
+              onChange={(e) => setbtnactive(e.target.checked)}
             />
             <p className="check-box-gape">
               I agree to the Terms & Conditions and Privacy Policy
@@ -118,10 +100,13 @@ const handleValidation = (value) => {
           <p className="error-message" style={{ color: "red" }}>
             {error}
           </p>
+          <p className="success-message" style={{ color: "green" }}>
+            {success}
+          </p>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Registration;

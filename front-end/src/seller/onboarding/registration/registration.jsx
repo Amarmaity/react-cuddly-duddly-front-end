@@ -2,17 +2,69 @@ import React, { useState } from "react";
 import logo from "../../../assets/companylogoContact.webp";
 import babyHug from "../../../assets/motherandchildContact.webp";
 import "./regstration.css";
-import { useNavigate } from "react-router-dom";
-// import axois from "axios";
+// import { useNavigate } from "react-router-dom";
+// import axois from "axios"; ?
 
 
 const Registration=()=> {
   const [btnactive, setbtnactive] = useState(false);
   const [phoneEmail, setPhoneEmail] = useState("");
+  const [error, setError] = useState(""); 
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const sendOTP = async() => {
+const handleValidation = (value) => {
+
+  setError("");
+
+  const phoneRegex = /^\d{10}$/;
+
+  const emailRegex =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // PHONE CHECK
+
+  if (/^\d+$/.test(value)) {
+
+    if (phoneRegex.test(value)) {
+
+      setPhoneEmail(value);
+
+      sendOTP(value);
+
+    } else {
+
+      setError(
+        "Please enter a valid 10-digit phone number."
+      );
+
+    }
+
+  }
+
+  // EMAIL CHECK
+
+  else {
+
+    if (emailRegex.test(value)) {
+
+      setPhoneEmail(value);
+
+      sendOTP(value);
+
+    } else {
+
+      setError(
+        "Please enter a valid email address."
+      );
+
+    }
+
+  }
+
+};
+
+  const sendOTP = async(value) => {
     try {
 
       const response = await axois.post(
@@ -22,9 +74,7 @@ const Registration=()=> {
     };
   }
 
-  const activebtn = () => {
-    setbtnactive(!btnactive);
-  };
+ 
 
   return (
     <div className="registration-main-div">
@@ -48,6 +98,7 @@ const Registration=()=> {
             value={phoneEmail}
             onChange={(e) => setPhoneEmail(e.target.value)}
           />
+                
 
           <div className="registration-check-box">
             <input type="checkbox" 
@@ -58,11 +109,15 @@ const Registration=()=> {
             </p>
           </div>
           <button
-            disabled={btnactive === true ? true : false}
+            disabled={!btnactive}
             className={btnactive ? "continue-btn active-btn" : "continue-btn2"}
+            onClick={() => handleValidation(phoneEmail)}
           >
             Send OTP
           </button>
+          <p className="error-message" style={{ color: "red" }}>
+            {error}
+          </p>
         </div>
       </div>
     </div>

@@ -57,7 +57,7 @@ const Registration = () => {
       setSuccess("");
     }
   };
-
+  
   return (
     <div className="registration-main-div">
       <div className="logo-image-div">

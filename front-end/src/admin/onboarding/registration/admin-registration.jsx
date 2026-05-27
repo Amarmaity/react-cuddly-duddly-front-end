@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./admin-registration.css";
+import Message from "../../../components/messages";
+import axios from "axios";
+
+
 
 const AdminRegistration = () => {
   const [formData, setFormData] = useState({
@@ -21,22 +25,14 @@ const AdminRegistration = () => {
 
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
 
-  const formIsValid =
-    formData.full_name.trim().length >= 3 &&
-    emailRegex.test(formData.email) &&
-    phoneRegex.test(formData.mobile) &&
-    formData.user_type.trim() !== "" &&
-    passwordRegex.test(formData.password) &&
-    formData.password === formData.confirm_password;
-
   // ================= SUBMIT =================
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    if (formData.full_name.trim().length < 3 && formData.full_name === "") {
+    if (formData.full_name.trim().length < 3) {
       setError("Full name must be at last 3 characters");
       return;
     }
@@ -68,7 +64,27 @@ const AdminRegistration = () => {
       return;
     }
 
-    setSuccess("Registration Successful");
+    // setSuccess("Registration Successful");
+    try {
+      const payload = {
+        username: formData.full_name.trim(),
+        email: formData.email.trim(),
+        mobile: formData.mobile.trim(),
+        password: formData.password,
+        user_type: formData.user_type,
+      };
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/admin/register/`,
+        payload,
+      );
+      setSuccess(response.data.message || "Registration successful!");
+      setError("");
+    } catch (error) {
+      console.error("Error during registration:", error);
+      setError("Registration failed. Please try again.");
+      setSuccess("");
+    }
   };
 
   return (
@@ -129,11 +145,11 @@ const AdminRegistration = () => {
                     setFormData({ ...formData, user_type: e.target.value })
                   }
                 >
+                  <option value="">Select user type</option>
                   <option value="admin">Admin</option>
                   <option value="seller">Seller</option>
                   <option value="tester">Tester</option>
                   <option value="operations">Operations</option>
-                  <option value="super-user">Super User</option>
                 </select>
               </div>
             </div>
@@ -167,17 +183,15 @@ const AdminRegistration = () => {
               </div>
             </div>
 
-            <button type="submit" disabled={!formIsValid}>
+            <button type="submit">
               Register
             </button>
           </form>
-          <p className="error-message" style={{ color: "red" }}>
-            {error}
-          </p>
-
-          <p className="success-message" style={{ color: "green" }}>
-            {success}
-          </p>
+          <Message type="error" message={error}
+          clearMessage={setError} />
+          <Message type="success"
+          message={success}
+           clearMessage={setSuccess} />
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import random
-from .models import OTP, SellerProfile
+from .models import OTP, SellerProfile, CustomUser
 from .permissions import IsAdmin
 from rest_framework import status
 from .serializers import (
@@ -34,6 +34,28 @@ def register(request):
             "data": serializer.data,
         },
         status=status.HTTP_201_CREATED,
+    )
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def check_admin_users(request):
+
+    email = request.query_params.get("email", "").strip()
+    mobile = request.query_params.get("mobile", "").strip()
+
+    user_exists = (
+        CustomUser.objects.filter(email=email).exists()
+        or CustomUser.objects.filter(mobile=mobile).exists()
+    )
+
+    return Response(
+        {
+            "message": "User already exists" if user_exists else "New User",
+            "success": True,
+            "exists": user_exists,
+        },
+        status=status.HTTP_200_OK,
     )
 
 

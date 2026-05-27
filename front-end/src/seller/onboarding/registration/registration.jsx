@@ -3,7 +3,7 @@ import logo from "../../../assets/companylogoContact.webp";
 import babyHug from "../../../assets/motherandchildContact.webp";
 import "./regstration.css";
 // import { useNavigate } from "react-router-dom";
-// import axois from "axios"; ?
+// import axios from "axios";
 
 const Registration = () => {
   const [btnactive, setbtnactive] = useState(false);
@@ -46,7 +46,7 @@ const Registration = () => {
 
   const sendOTP = async (value) => {
     try {
-      const response = await axois.post("#", {
+      const response = await axios.post("#", {
         phoneEmail: value,
       });
       setSuccess("OTP sent successfully!");

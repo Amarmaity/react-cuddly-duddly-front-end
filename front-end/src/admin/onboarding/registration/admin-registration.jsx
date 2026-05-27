@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./admin-registration.css";
 import Message from "../../../components/messages";
 import axios from "axios";
 
-
-
 const AdminRegistration = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
@@ -16,21 +17,25 @@ const AdminRegistration = () => {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [userExist, setUserExist] = useState(false);
 
-  const checkUser = async (e) => {
-    e.preventDefault();
+  const checkUser = async () => {
     try {
-      const response = await axios.get( `${import.meta.env.VITE_API_BASE_URL}/api/admin/check-user/`, {
-        email: formData.email.trim(),
-        mobile: formData.mobile.trim(),
-      });
-      setUserExist(response.data.exists);
-    }catch (error) {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/api/admin/check-admin-user/`,
+        {
+          params: {
+            email: formData.email.trim(),
+            mobile: formData.mobile.trim(),
+          },
+        },
+      );
+      return response.data.exists;
+    } catch (error) {
       console.error("Error checking user existence:", error);
+      setError("Unable to check user details. Please try again.");
+      return null;
     }
   };
-
 
   // ================= VALIDATION =================
 
@@ -79,13 +84,18 @@ const AdminRegistration = () => {
     }
 
     const userAlreadyExsit = await checkUser();
-    if (userAlreadyExsit) {
-      setUserExist(true);
-      setError("User with this email or phone already exists");
+    if (userAlreadyExsit === null) {
       return;
     }
 
-    // setSuccess("Registration Successful");
+    if (userAlreadyExsit) {
+      setError("User with this email or phone already exists");
+      setTimeout(() => {
+        navigate("/admin-login");
+      }, 3100);
+      return;
+    }
+
     try {
       const payload = {
         username: formData.full_name.trim(),
@@ -103,7 +113,14 @@ const AdminRegistration = () => {
       setError("");
     } catch (error) {
       console.error("Error during registration:", error);
-      setError("Registration failed. Please try again.");
+      const message =
+        error.response?.data?.email ||
+        error.response?.data?.mobile ||
+        error.response?.data?.non_field_errors?.[0] ||
+        error.response?.data?.message ||
+        "Registration failed. Please try again.";
+
+      setError(message);
       setSuccess("");
     }
   };
@@ -204,15 +221,10 @@ const AdminRegistration = () => {
               </div>
             </div>
 
-            <button type="submit">
-              Register
-            </button>
+            <button type="submit">Register</button>
           </form>
-          <Message type="error" message={error}
-          clearMessage={setError} />
-          <Message type="success"
-          message={success}
-           clearMessage={setSuccess} />
+          <Message type="error" message={error} clearMessage={setError} />
+          <Message type="success" message={success} clearMessage={setSuccess} />
         </div>
       </div>
     </div>

@@ -16,6 +16,21 @@ const AdminRegistration = () => {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [userExist, setUserExist] = useState(false);
+
+  const checkUser = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.get( `${import.meta.env.VITE_API_BASE_URL}/api/admin/check-user/`, {
+        email: formData.email.trim(),
+        mobile: formData.mobile.trim(),
+      });
+      setUserExist(response.data.exists);
+    }catch (error) {
+      console.error("Error checking user existence:", error);
+    }
+  };
+
 
   // ================= VALIDATION =================
 
@@ -26,7 +41,6 @@ const AdminRegistration = () => {
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
 
   // ================= SUBMIT =================
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -61,6 +75,13 @@ const AdminRegistration = () => {
 
     if (formData.password != formData.confirm_password) {
       setError("Password do not match");
+      return;
+    }
+
+    const userAlreadyExsit = await checkUser();
+    if (userAlreadyExsit) {
+      setUserExist(true);
+      setError("User with this email or phone already exists");
       return;
     }
 

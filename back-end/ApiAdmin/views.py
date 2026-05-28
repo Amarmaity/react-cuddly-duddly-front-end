@@ -3,9 +3,10 @@ from .models import OTP, SellerProfile, CustomUser
 from .permissions import IsAdmin
 from rest_framework import status
 from .serializers import (
+    AdminLoginSerializer,
     RegisterSerializer,
     AdminCreateSellerSerializer,
-    SellerListSerializer,
+    SellerListSerializer
 )
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
@@ -37,26 +38,65 @@ def register(request):
     )
 
 
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 @permission_classes([AllowAny])
 def check_admin_users(request):
 
-    email = request.query_params.get("email", "").strip()
-    mobile = request.query_params.get("mobile", "").strip()
+    # ================= GET =================
+    if request.method == "GET":
 
-    user_exists = (
-        CustomUser.objects.filter(email=email).exists()
-        or CustomUser.objects.filter(mobile=mobile).exists()
-    )
+        email = request.query_params.get("email", "").strip()
+        mobile = request.query_params.get("mobile", "").strip()
 
-    return Response(
-        {
-            "message": "User already exists" if user_exists else "New User",
-            "success": True,
-            "exists": user_exists,
-        },
-        status=status.HTTP_200_OK,
-    )
+        user_exists = (
+            CustomUser.objects.filter(email=email).exists()
+            or CustomUser.objects.filter(mobile=mobile).exists()
+        )
+
+        return Response(
+            {
+                "message": "User already exists" if user_exists else "New User",
+                "success": True,
+                "exists": user_exists,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    # ================= POST LOGIN =================
+    elif request.method == "POST":
+
+        serializer = AdminLoginSerializer(data=request.data)
+
+        if serializer.is_valid():
+
+            user = serializer.validated_data["user"]
+
+            return Response(
+                {
+                    "success": True,
+                    "exists": True,
+                    "message": "Login Successful",
+                    "data": {
+                        "id": user.id,
+                        "username": user.username,
+                        "email": user.email,
+                        "mobile": user.mobile,
+                        "user_type": user.user_type,
+                    },
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        return Response(
+            {
+                "success": False,
+                "exists": False,
+                "message": serializer.errors,
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
 
 
 # ----------------

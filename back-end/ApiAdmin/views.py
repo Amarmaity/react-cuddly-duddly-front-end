@@ -6,7 +6,7 @@ from .serializers import (
     AdminLoginSerializer,
     RegisterSerializer,
     AdminCreateSellerSerializer,
-    SellerListSerializer
+    SellerListSerializer,
 )
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
@@ -44,7 +44,6 @@ def check_admin_users(request):
 
     # ================= GET =================
     if request.method == "GET":
-
         email = request.query_params.get("email", "").strip()
         mobile = request.query_params.get("mobile", "").strip()
 
@@ -64,18 +63,22 @@ def check_admin_users(request):
 
     # ================= POST LOGIN =================
     elif request.method == "POST":
-
         serializer = AdminLoginSerializer(data=request.data)
 
         if serializer.is_valid():
-
             user = serializer.validated_data["user"]
+
+            refresh = RefreshToken.for_user(user)
 
             return Response(
                 {
                     "success": True,
                     "exists": True,
                     "message": "Login Successful",
+                    "token": {
+                        "access": str(refresh.access_token),
+                        "refresh": str(refresh),
+                    },
                     "data": {
                         "id": user.id,
                         "username": user.username,
@@ -97,6 +100,35 @@ def check_admin_users(request):
         )
 
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, IsAdmin])
+def admin_dashboard(request):
+
+    return Response(
+        {
+            "message": "Admin Dashboard",
+            "user": request.user.username,
+        }
+    )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated, IsAdmin])
+def logout_view(request):
+
+    try:
+        refresh_token = request.data.get("refresh")
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+
+        return Response(
+            {"success": True, "message": "Logout Successfull"},
+            status=status.HTTP_200_OK,
+        )
+    except Exception as e:
+        return Response(
+            {"success": False, "message": str(e)}, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 # ----------------

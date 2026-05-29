@@ -62,6 +62,51 @@ class RegisterSerializer(serializers.Serializer):
         }
 
 
+
+
+class AdminLoginSerializer(serializers.Serializer):
+    email_or_mobile = serializers.CharField(required=False, allow_blank=False)
+    email_or_phone = serializers.CharField(required=False, allow_blank=False)
+    password = serializers.CharField()
+    user_type = serializers.CharField()
+
+    def validate(self, data):
+        email_or_mobile = data.get("email_or_mobile") or data.get("email_or_phone")
+        password = data.get("password")
+        user_type = data.get("user_type")
+
+        if not email_or_mobile:
+            raise serializers.ValidationError(
+                {"email_or_mobile": "Email or mobile number is required."}
+            )
+
+        user = User.objects.filter(
+            user_type=user_type
+        ).filter(
+            email=email_or_mobile
+        ).first() or User.objects.filter(
+            user_type=user_type
+        ).filter(
+            mobile=email_or_mobile
+        ).first()
+
+        if not user:
+            raise serializers.ValidationError("User not found")
+        
+        if not user.check_password(password):
+            raise serializers.ValidationError("Incorrect password")
+
+        data["user"] = user
+        return data
+
+
+
+
+
+
+
+
+
 class AdminCreateSellerSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
     mobile = serializers.CharField(max_length=15)
@@ -126,40 +171,6 @@ class AdminCreateSellerSerializer(serializers.ModelSerializer):
 
 
 
-class AdminLoginSerializer(serializers.Serializer):
-    email_or_mobile = serializers.CharField(required=False, allow_blank=False)
-    email_or_phone = serializers.CharField(required=False, allow_blank=False)
-    password = serializers.CharField()
-    user_type = serializers.CharField()
-
-    def validate(self, data):
-        email_or_mobile = data.get("email_or_mobile") or data.get("email_or_phone")
-        password = data.get("password")
-        user_type = data.get("user_type")
-
-        if not email_or_mobile:
-            raise serializers.ValidationError(
-                {"email_or_mobile": "Email or mobile number is required."}
-            )
-
-        user = User.objects.filter(
-            user_type=user_type
-        ).filter(
-            email=email_or_mobile
-        ).first() or User.objects.filter(
-            user_type=user_type
-        ).filter(
-            mobile=email_or_mobile
-        ).first()
-
-        if not user:
-            raise serializers.ValidationError("User not found")
-        
-        if not user.check_password(password):
-            raise serializers.ValidationError("Incorrect password")
-
-        data["user"] = user
-        return data
 
 
 

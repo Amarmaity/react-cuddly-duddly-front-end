@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
 import "./adminLogin.css";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Message from "../../../components/messages";
 import axios from "axios";
@@ -18,6 +17,12 @@ const AdminLogin = () => {
   const [success, setSuccess] = useState("");
   const emailOrPhoneRegex = /^([^\s@]+@[^\s@]+\.[^\s@]+|[6-9]\d{9})$/;
 
+  const clearAuthState = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("admin_user");
+  };
+
   const checkUser = async () => {
     try {
       const response = await axios.post(
@@ -28,8 +33,14 @@ const AdminLogin = () => {
           user_type: formData.user_type.trim(),
         },
       );
+
       if (response.data.exists) {
-        setSuccess("Login Succcessful!");
+        clearAuthState();
+        localStorage.setItem("access_token", response.data.token.access);
+        localStorage.setItem("refresh_token", response.data.token.refresh);
+        localStorage.setItem("admin_user", JSON.stringify(response.data.data));
+
+        setSuccess("Login Successful!");
         setError("");
 
         setTimeout(() => {
@@ -114,7 +125,6 @@ const AdminLogin = () => {
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label>Email or Phone</label>
-
             <input
               type="text"
               placeholder="Enter email or phone"
@@ -128,7 +138,6 @@ const AdminLogin = () => {
 
           <div className="input-group">
             <label>Password</label>
-
             <input
               type="password"
               placeholder="Enter password"
@@ -142,7 +151,6 @@ const AdminLogin = () => {
 
           <div className="input-group">
             <label>User Type</label>
-
             <select
               value={formData.user_type}
               onChange={(e) =>
@@ -164,7 +172,6 @@ const AdminLogin = () => {
           </div>
         </form>
         <Message type="error" message={error} clearMessage={setError} />
-
         <Message type="success" message={success} clearMessage={setSuccess} />
       </div>
     </div>

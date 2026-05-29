@@ -1,0 +1,48 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.sidebar-main {
+  width: 260px;
+  min-height: 100vh;
+  background-color: #1e293b;
+  padding: 20px;
+}
+
+.sidebar-heading {
+  margin-bottom: 40px;
+}
+
+.sidebar-heading h1 {
+  color: white;
+  text-align: center;
+  font-size: 28px;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 40px;
+}
+
+.sidebar-link {
+  text-decoration: none;
+  color: white;
+  padding: 14px 18px;
+  border-radius: 10px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+.sidebar-link:hover {
+  background-color: #334155;
+}
+
+.sidebar-link.active {
+  background-color: #e5e7eb;
+  color: #0f172a;
+  font-weight: bold;
+}

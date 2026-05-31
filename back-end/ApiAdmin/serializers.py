@@ -63,7 +63,6 @@ class RegisterSerializer(serializers.Serializer):
 
 
 
-
 class AdminLoginSerializer(serializers.Serializer):
     email_or_mobile = serializers.CharField(required=False, allow_blank=False)
     email_or_phone = serializers.CharField(required=False, allow_blank=False)
@@ -98,10 +97,6 @@ class AdminLoginSerializer(serializers.Serializer):
 
         data["user"] = user
         return data
-
-
-
-
 
 
 
@@ -168,9 +163,6 @@ class AdminCreateSellerSerializer(serializers.ModelSerializer):
         seller = SellerProfile.objects.create(user=user, **validated_data)
 
         return seller
-
-
-
 
 
 

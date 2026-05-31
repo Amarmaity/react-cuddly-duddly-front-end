@@ -1,0 +1,180 @@
+.seller-heading {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  border: 1px solid #d3d3d3;
+  border-radius: 20px;
+  padding: 15px;
+  margin-top: 10px;
+
+  background-color: #fff;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.seller-heading h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.seller-svg {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.seller-body {
+  margin-top: 15px;
+  padding: 20px;
+
+  border: 1px solid #d3d3d3;
+  border-radius: 20px;
+  background-color: #fff;
+
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.seller-tab-area {
+  display: flex;
+  gap: 15px;
+
+  border-bottom: 1px solid #d3d3d3;
+  padding-bottom: 15px;
+}
+
+.seller-tab,
+.payout-tab {
+  cursor: pointer;
+  padding: 10px 20px;
+  border-radius: 8px;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  transition: all 0.3s ease;
+}
+
+.seller-tab:hover,
+.payout-tab:hover {
+  background-color: #f3f4f6;
+}
+
+.active-tab {
+  background-color: #343a40;
+  color: #fff;
+}
+
+.seller-content {
+  margin-top: 20px;
+}
+
+.seller-search-area {
+  margin-bottom: 20px;
+}
+
+.seller-search {
+  width: 100%;
+  max-width: 350px;
+
+  padding: 12px 15px;
+
+  border: 1px solid #d3d3d3;
+  border-radius: 8px;
+
+  outline: none;
+  font-size: 14px;
+}
+
+.seller-search:focus {
+  border-color: #2563eb;
+}
+
+.seller-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.seller-table thead {
+  background-color: #f8f9fa;
+}
+
+.seller-table th {
+  text-align: left;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.seller-table td {
+  padding: 14px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.seller-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.status-active {
+  color: #15803d;
+  background-color: #dcfce7;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.status-inactive {
+  color: #b91c1c;
+  background-color: #fee2e2;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.action-btn {
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+
+  background-color: #2563eb;
+  color: #fff;
+
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.action-btn:hover {
+  background-color: #1d4ed8;
+}
+
+
+.seller-create{
+  margin-left: 880px;
+}
+
+@media (max-width: 768px) {
+  .seller-heading h1 {
+    font-size: 22px;
+  }
+
+  .seller-svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .seller-tab-area {
+    flex-wrap: wrap;
+  }
+
+  .seller-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .seller-search {
+    max-width: 100%;
+  }
+}

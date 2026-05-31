@@ -7,6 +7,7 @@ import AdminLayout from "./admin/adminComponents/layout/AdminLayout";
 import Dashboard from "./admin/adminComponents/pages/dashboard";
 import Seller from "./admin/adminComponents/pages/seller/seller";
 import Product from "./admin/adminComponents/pages/product/product";
+import CreateSeller from "./admin/adminComponents/pages/seller/createSeller";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/admin-dashboard" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="seller" element={<Seller />} />
+          <Route path="seller/create" element={<CreateSeller />} />
           <Route path="product" element={<Product />} />
         </Route>
 

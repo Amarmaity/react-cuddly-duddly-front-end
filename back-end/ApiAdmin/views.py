@@ -218,11 +218,6 @@ def verify_otp(request):
         )
 
 
-@api_view(["GET"])
-@permission_classes([IsAuthenticated, IsAdmin])
-def admin_dashboard(request):
-    return Response({"message": "Welcome Admin", "user": request.user.username})
-
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated, IsAdmin])

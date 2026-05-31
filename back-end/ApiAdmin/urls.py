@@ -10,4 +10,5 @@ urlpatterns = [
     path("send-otp/", views.send_otp),
     path("verify-otp/", views.verify_otp),
     path("logout/", views.logout_view),
+    path("admin-crearte-get-seller/", views.all_sellers),
 ]

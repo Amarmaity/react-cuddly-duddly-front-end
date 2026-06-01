@@ -149,9 +149,8 @@
   background-color: #1d4ed8;
 }
 
-
-.seller-create{
-  margin-left: 880px;
+.seller-create {
+  margin-left: auto;
 }
 
 @media (max-width: 768px) {
@@ -177,4 +176,151 @@
   .seller-search {
     max-width: 100%;
   }
+}
+
+/* Create Seller CSS */
+
+.create-seller-body {
+  background: #ffffff;
+  border: 1px solid #d3d3d3;
+  border-radius: 15px;
+  padding: 25px;
+  margin: 20px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.create-seller-body h1 {
+  margin-bottom: 25px;
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Form Rows */
+.row-1,
+.row-2,
+.row-3,
+.row-4,
+.row-5,
+.row-6,
+.row-7 {
+  display: grid;
+  grid-template-columns: 180px 1fr 180px 1fr;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Labels */
+.row-1 label,
+.row-2 label,
+.row-3 label,
+.row-4 label,
+.row-5 label,
+.row-6 label,
+.row-7 label {
+  font-weight: 600;
+  color: #444;
+}
+
+/* Inputs & Selects */
+.row-1 input,
+.row-2 input,
+.row-3 input,
+.row-4 input,
+.row-5 input,
+.row-6 input,
+.row-7 input,
+.row-1 select,
+.row-7 select,
+.row-2 select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d3d3d3;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.row-1 input:focus,
+.row-2 input:focus,
+.row-3 input:focus,
+.row-4 input:focus,
+.row-5 input:focus,
+.row-6 input:focus,
+.row-7 input:focus,
+.row-1 select:focus,
+.row-2 select:focus,
+.row-7 select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0px 0px 4px rgba(79, 70, 229, 0.3);
+}
+
+/* Error */
+.error-message {
+  color: red;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* Success */
+.success-message {
+  color: green;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* Button Area */
+.form-btn-area {
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.create-seller-btn {
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.create-seller-btn:hover {
+  background: #4338ca;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .row-1,
+  .row-2,
+  .row-3,
+  .row-4,
+  .row-5,
+  .row-6,
+  .row-7 {
+    grid-template-columns: 1fr;
+  }
+
+  .create-seller-body {
+    margin: 10px;
+    padding: 15px;
+  }
+}
+
+.create-seller-button {
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  margin: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: 0.3s;
 }

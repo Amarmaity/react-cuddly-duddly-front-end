@@ -34,6 +34,8 @@ class OTP(models.Model):
 
         return (timezone.now() - self.created_at).total_seconds() > 300
 
+
+
 #Seller Model
 class SellerProfile(models.Model):
     GST_CHOICES = (

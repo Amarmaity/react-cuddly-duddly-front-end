@@ -240,7 +240,7 @@ def all_sellers(request):
             )
 
         elif request.method == "POST":
-            serializer = AdminCreateSellerSerializer(data=request.data)
+            serializer = SellerListSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
 

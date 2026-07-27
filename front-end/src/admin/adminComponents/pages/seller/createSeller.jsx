@@ -1,68 +1,97 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Message from "../../../../components/messages";
+import axios from "axios";
 
-const createSeller = () => {
+
+const initialFormData = {
+  email: "",
+  mobile: "",
+  business_name: "",
+  store_display_name: "",
+  business_type: "",
+
+  have_gst: "0",
+  gst_number: "",
+
+  pan: "",
+  name_as_per_pan: "",
+
+  city: "",
+  state: "",
+  dist: "",
+  pin: "",
+
+  room_building: "",
+  street_landmark: "",
+
+  pick_add_one: "",
+  pick_add_two: "",
+  pickup_pin: "",
+  pickup_land_mark: "",
+  pickup_city: "",
+  pickup_state: "",
+
+  contact_p_name: "",
+  contact_number: "",
+
+  account_holder_name: "",
+  bank_name: "",
+  ifsc_code: "",
+  account_number: "",
+
+  products_category: "",
+  monthly_order: "",
+  average_dispatch: "same_day",
+
+  commission: "",
+  seller_logo: null,
+};
+
+const CreateSeller = () => {
+  const [formData, setFormData] = useState(initialFormData);
   const [error, setError] = useState();
   const [success, setSuccess] = useState();
-
-  const [fromData, setFromData] = useState({
-    email: "",
-    mobile: "",
-    business_name: "",
-    store_display_name: "",
-    business_type: "",
-
-    have_gst: "0",
-    gst_number: "",
-
-    pan: "",
-    name_as_per_pan: "",
-
-    city: "",
-    state: "",
-    dist: "",
-    pin: "",
-
-    room_building: "",
-    street_landmark: "",
-
-    pick_add_one: "",
-    pick_add_two: "",
-    pickup_pin: "",
-    pickup_land_mark: "",
-    pickup_city: "",
-    pickup_state: "",
-
-    contact_p_name: "",
-    contact_number: "",
-
-    account_holder_name: "",
-    bank_name: "",
-    ifsc_code: "",
-    account_number: "",
-
-    products_category: "",
-    monthly_order: "",
-    average_dispatch: "same_day",
-
-    commission: "",
-    seller_logo: "",
-  });
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const validateFrom = () => {
-    const errors = {};
-    if (!fromData.email) {
-      errors.email("Email is required");
+    const validationErrors = {};
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[6-9]\d{9}$/;
+    const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    const pinRegex = /^[1-9][0-9]{5}$/;
+    const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+
+
+    if (!formData.email.trim()) {
+      validationErrors.email = "Email is required";
+    } else if (!emailRegex.test(formData.email.trim())) {
+      validationErrors.email = "Enter a valid email address";
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = "Invalid email";
-
-      if (!/^[6-9]\d{9}$/.test(formData.mobile)) {
-        errors.mobile = "Invalid mobile number";
-      }
+    if (!formData.mobile.trim()) {
+      validationErrors.mobile = "Mobile number is required";
+    } else if (!phoneRegex.test(formData.mobile.trim())) {
+      validationErrors.mobile = "Enter a valid 10 digit mobile number";
     }
-    return errors;
+
+    if (!formData.business_name.trim()) {
+      validationErrors.business_name = "Business name is required";
+    }
+
+    if (!formData.store_display_name.trim()) {
+      validationErrors.store_display_name = "Store display name is required";
+    }
+
+    if (!formData.business_type.trim()) {
+      validationErrors.business_type = "Business type is required";
+    }
+
+    if (!formData.have_gst === "1" && !formData.gst_number.trim()) {
+      validationErrors.gst_number = "GST number is required";
+    } else if (fromData.)
+    return validationErrors;
   };
 
   const handleSubmit = async (e) => {
@@ -386,4 +415,4 @@ const createSeller = () => {
   );
 };
 
-export default createSeller;
+export default CreateSeller;

@@ -1,0 +1,101 @@
+version: "3.9"
+
+services:
+  # ==========================
+  # PostgreSQL Database
+  # ==========================
+  db:
+    image: postgres:16-alpine
+    container_name: cuddlyduddly-db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: cuddlyduddly_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - cuddlyduddly_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cuddlyduddly_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - cuddlyduddly-network
+
+
+  # ==========================
+  # Django Backend
+  # ==========================
+  backend:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile
+
+    image: amar222/cuddlyduddly-backend:v1
+    container_name: cuddlyduddly-backend
+
+    restart: unless-stopped
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    env_file:
+      - ./back-end/.env
+
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+
+    ports:
+      - "8000:8000"
+
+    networks:
+      - cuddlyduddly-network
+
+
+  # ==========================
+  # React Frontend
+  # ==========================
+  frontend:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:8000
+
+    image: amar222/cuddlyduddly-frontend:v1
+    container_name: cuddlyduddly-frontend
+
+    restart: unless-stopped
+
+    depends_on:
+      - backend
+
+    ports:
+      - "3000:80"
+
+    networks:
+      - cuddlyduddly-network
+
+
+# ==========================
+# Docker Volume
+# ==========================
+volumes:
+  cuddlyduddly_postgres_data:
+
+
+# ==========================
+# Docker Network
+# ==========================
+networks:
+  cuddlyduddly-network:
+    driver: bridge

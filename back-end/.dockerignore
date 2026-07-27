@@ -1,0 +1,32 @@
+# Python virtual environments
+env/
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment secrets
+.env
+.env.*
+
+# Git and editor files
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Local database and logs
+*.sqlite3
+*.log
+
+# Generated Django folders
+staticfiles/
+
+# Testing files
+.pytest_cache/
+.coverage
+htmlcov/

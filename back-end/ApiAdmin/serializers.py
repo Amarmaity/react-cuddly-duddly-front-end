@@ -142,6 +142,9 @@ class AdminCreateSellerSerializer(serializers.ModelSerializer):
         return value
 
     def validate_ifsc_code(self, value):
+        if not value:
+            return value
+
         if not re.match(r"^[A-Z]{4}0[A-Z0-9]{6}$", value):
             raise serializers.ValidationError("Invalid IFSC code.")
         return value

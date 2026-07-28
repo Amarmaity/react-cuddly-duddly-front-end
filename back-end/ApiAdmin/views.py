@@ -240,15 +240,16 @@ def all_sellers(request):
             )
 
         elif request.method == "POST":
-            serializer = SellerListSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
+            serializer = AdminCreateSellerSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            seller = serializer.save()
+            response_serializer = SellerListSerializer(seller)
 
             return Response(
                 {
                     "message": "Seller created successfully",
                     "success": True,
-                    "data": serializer.data,
+                    "data": response_serializer.data,
                 },
                 status=status.HTTP_201_CREATED,
             )

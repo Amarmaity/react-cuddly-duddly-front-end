@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import Message from "../../../../components/messages";
+import { adminApiRequest } from "../../utils/adminApi";
 import "./seller.css";
 
 const initialFormData = {
@@ -36,6 +36,8 @@ const initialFormData = {
   monthly_order: "",
   average_dispatch: "same_day",
   commission: "",
+  password: "",
+  confirm_password: "",
 };
 
 const textSections = [
@@ -93,6 +95,13 @@ const textSections = [
       { name: "account_number", label: "Account Number", inputMode: "numeric", maxLength: 30 },
     ],
   },
+  {
+    title: "Login Details",
+    fields: [
+      { name: "password", label: "Password", type: "password" },
+      { name: "confirm_password", label: "Confirm Password", type: "password" },
+    ],
+  },
 ];
 
 const selectFields = [
@@ -143,8 +152,6 @@ const selectFields = [
     ],
   },
 ];
-
-const getApiBaseUrl = () => import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") || "";
 
 const formatBackendError = (data) => {
   if (!data) return "Failed to create seller. Please try again.";
@@ -282,11 +289,21 @@ const CreateSeller = () => {
       errors.commission = "Commission must be between 0 and 100";
     }
 
+    if (!trimmed.password) errors.password = "Password is required";
+    if (!trimmed.confirm_password) errors.confirm_password = "Confirm password is required";
+    if (trimmed.password && trimmed.confirm_password && trimmed.password !== trimmed.confirm_password) {
+      errors.confirm_password = "Passwords do not match";
+    }
+
     return errors;
   };
 
   const buildPayload = () =>
     Object.entries(formData).reduce((payload, [key, value]) => {
+      if (key === "confirm_password") {
+        return payload;
+      }
+
       const nextValue = typeof value === "string" ? value.trim() : value;
       if (nextValue !== "") {
         payload[key] = nextValue;
@@ -308,22 +325,16 @@ const CreateSeller = () => {
       return;
     }
 
-    const accessToken = localStorage.getItem("access_token");
-
-    if (!accessToken) {
-      setError("Admin session expired. Please login again.");
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
-      await axios.post(`${getApiBaseUrl()}/api/admin/admin-crearte-get-seller/`, buildPayload(), {
+      await adminApiRequest({
+        method: "post",
+        url: "/api/admin/admin-crearte-get-seller/",
+        data: buildPayload(),
         headers: {
-          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
-        timeout: 10000,
       });
 
       setFormData(initialFormData);

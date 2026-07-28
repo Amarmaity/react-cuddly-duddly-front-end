@@ -6,10 +6,12 @@ from .serializers import (
     AdminLoginSerializer,
     RegisterSerializer,
     AdminCreateSellerSerializer,
+    AdminSellerDetailSerializer,
     SellerListSerializer,
 )
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -131,6 +133,66 @@ def logout_view(request):
         )
 
 
+@api_view(["GET", "PUT", "PATCH"])
+@permission_classes([IsAuthenticated, IsAdmin])
+def seller_detail(request, seller_id):
+    seller = get_object_or_404(SellerProfile.objects.select_related("user"), id=seller_id)
+
+    if request.method == "GET":
+        serializer = AdminSellerDetailSerializer(seller)
+        return Response(
+            {
+                "success": True,
+                "message": "Seller fetched successfully",
+                "data": serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    serializer = AdminSellerDetailSerializer(
+        seller,
+        data=request.data,
+        partial=request.method == "PATCH",
+    )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    return Response(
+        {
+            "success": True,
+            "message": "Seller updated successfully",
+            "data": serializer.data,
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated, IsAdmin])
+def seller_status(request, seller_id):
+    seller = get_object_or_404(SellerProfile.objects.select_related("user"), id=seller_id)
+    is_active = request.data.get("is_active")
+
+    if not isinstance(is_active, bool):
+        return Response(
+            {"success": False, "message": {"is_active": "Boolean value is required."}},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    seller.user.is_active = is_active
+    seller.user.save(update_fields=["is_active"])
+    serializer = SellerListSerializer(seller)
+
+    return Response(
+        {
+            "success": True,
+            "message": "Seller activated successfully" if is_active else "Seller deactivated successfully",
+            "data": serializer.data,
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
 # ----------------
 # Send Otp
 # ----------------
@@ -146,12 +208,18 @@ def send_otp(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        user = User.objects.filter(mobile=mobile).filter()
+        user = User.objects.filter(mobile=mobile).first()
 
         if not user:
             return Response(
                 {"message": "Invalide mobile number", "success": False},
                 status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not user.is_active:
+            return Response(
+                {"message": "This account is inactive. Please contact admin.", "success": False},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         otp = str(random.randint(100000, 999999))
@@ -193,6 +261,12 @@ def verify_otp(request):
             )
 
         user = User.objects.get(mobile=mobile)
+
+        if not user.is_active:
+            return Response(
+                {"message": "This account is inactive. Please contact admin.", "success": False},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         # 🔥 CREATE JWT TOKEN
         refresh = RefreshToken.for_user(user)

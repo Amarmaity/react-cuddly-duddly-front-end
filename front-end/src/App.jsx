@@ -8,6 +8,7 @@ import Dashboard from "./admin/adminComponents/pages/dashboard";
 import Seller from "./admin/adminComponents/pages/seller/seller";
 import Product from "./admin/adminComponents/pages/product/product";
 import CreateSeller from "./admin/adminComponents/pages/seller/createSeller";
+import EditSeller from "./admin/adminComponents/pages/seller/editSeler";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="seller" element={<Seller />} />
           <Route path="seller/create" element={<CreateSeller />} />
+          <Route path="seller/:sellerId/edit" element={<EditSeller />} />
           <Route path="product" element={<Product />} />
         </Route>
 

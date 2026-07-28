@@ -190,10 +190,82 @@
 }
 
 .create-seller-body h1 {
-  margin-bottom: 25px;
+  margin: 0;
   font-size: 28px;
   font-weight: 600;
   color: #333;
+}
+
+.create-seller-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.create-seller-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.create-seller-section {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin: 0;
+  padding: 18px;
+}
+
+.create-seller-section legend {
+  padding: 0 8px;
+  color: #343a40;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.create-seller-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.create-seller-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 7px;
+}
+
+.create-seller-field label {
+  color: #444;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.create-seller-field input,
+.create-seller-field select {
+  width: 100%;
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #d3d3d3;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.create-seller-field input:focus,
+.create-seller-field select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0px 0px 4px rgba(79, 70, 229, 0.3);
+}
+
+.create-seller-field input:disabled {
+  color: #6b7280;
+  background-color: #f3f4f6;
+  cursor: not-allowed;
 }
 
 /* Form Rows */
@@ -273,8 +345,8 @@
 
 /* Button Area */
 .form-btn-area {
-  margin-top: 30px;
   display: flex;
+  gap: 12px;
   justify-content: flex-end;
 }
 
@@ -294,6 +366,28 @@
   background: #4338ca;
 }
 
+.create-seller-btn:disabled,
+.create-seller-secondary-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.create-seller-secondary-button {
+  background: #ffffff;
+  color: #343a40;
+  border: 1px solid #d3d3d3;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.create-seller-secondary-button:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .row-1,
@@ -309,6 +403,24 @@
   .create-seller-body {
     margin: 10px;
     padding: 15px;
+  }
+
+  .create-seller-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .create-seller-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-btn-area {
+    flex-direction: column-reverse;
+  }
+
+  .create-seller-btn,
+  .create-seller-secondary-button {
+    width: 100%;
   }
 }
 

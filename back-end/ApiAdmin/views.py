@@ -296,14 +296,12 @@ def verify_otp(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated, IsAdmin])
 def all_sellers(request):
-
     try:
         if request.method == "GET":
             queryset = (
                 SellerProfile.objects.select_related("user").all().order_by("-id")
             )
             serializer = SellerListSerializer(queryset, many=True)
-
             return Response(
                 {
                     "success": True,
@@ -312,7 +310,7 @@ def all_sellers(request):
                 },
                 status=status.HTTP_200_OK,
             )
-
+        
         elif request.method == "POST":
             serializer = AdminCreateSellerSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -327,7 +325,6 @@ def all_sellers(request):
                 },
                 status=status.HTTP_201_CREATED,
             )
-
     except Exception as e:
         return Response(
             {"success": False, "message": str(e)}, status=status.HTTP_400_BAD_REQUEST

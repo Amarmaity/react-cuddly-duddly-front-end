@@ -72,7 +72,7 @@ const SideBar = () => {
           </NavLink>
 
           <NavLink
-            to="/settings"
+            to="/admin-dashboard/settings"
             className={({ isActive }) =>
               isActive ? "sidebar-link active" : "sidebar-link"
             }

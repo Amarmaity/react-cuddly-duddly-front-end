@@ -9,6 +9,7 @@ import Seller from "./admin/adminComponents/pages/seller/seller";
 import Product from "./admin/adminComponents/pages/product/product";
 import CreateSeller from "./admin/adminComponents/pages/seller/createSeller";
 import EditSeller from "./admin/adminComponents/pages/seller/editSeler";
+import Settings from "./admin/adminComponents/pages/settings/settings";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="seller/create" element={<CreateSeller />} />
           <Route path="seller/:sellerId/edit" element={<EditSeller />} />
           <Route path="product" element={<Product />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
 
         {/* Admin Login */}

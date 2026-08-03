@@ -21,6 +21,8 @@ class ActiveUserTokenRefreshSerializer(TokenRefreshSerializer):
 
 
 class RegisterSerializer(serializers.Serializer):
+    first_name = serializers.CharField(max_length=30)
+    last_name = serializers.CharField(max_length=30)
     username = serializers.CharField(max_length=150)
     email = serializers.EmailField()
     mobile = serializers.CharField(max_length=15)
@@ -48,6 +50,8 @@ class RegisterSerializer(serializers.Serializer):
         password = validated_data.pop("password")
 
         user = User.objects.create_user(
+            first_name=validated_data["first_name"],
+            last_name=validated_data["last_name"],
             username=validated_data["username"],
             email=validated_data["email"],
             mobile=validated_data["mobile"],
@@ -69,12 +73,12 @@ class RegisterSerializer(serializers.Serializer):
     def to_representation(self, instance):
         return {
             "id": instance.id,
+            "first_name": instance.first_name,
             "username": instance.username,
             "email": instance.email,
             "mobile": instance.mobile,
             "user_type": instance.user_type,
         }
-
 
 
 class AdminLoginSerializer(serializers.Serializer):
@@ -114,7 +118,6 @@ class AdminLoginSerializer(serializers.Serializer):
 
         data["user"] = user
         return data
-
 
 
 class AdminCreateSellerSerializer(serializers.ModelSerializer):

@@ -9,8 +9,8 @@ urlpatterns = [
     path("register/", views.register),
     path("check-admin-user/", views.check_admin_users),
     path("admin-dashboard/", views.admin_dashboard),
-    path("send-otp/", views.send_otp),
-    path("verify-otp/", views.verify_otp),
+    # path("send-otp/", views.send_otp),
+    # path("verify-otp/", views.verify_otp),
     path(
         "token/refresh/",
         TokenRefreshView.as_view(serializer_class=ActiveUserTokenRefreshSerializer),

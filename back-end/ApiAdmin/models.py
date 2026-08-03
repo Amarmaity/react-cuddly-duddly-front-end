@@ -2,7 +2,8 @@ import uuid
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+import django.utils.timezone
+django.utils.timezone.now
 
 class UserType(models.TextChoices):
     ADMIN = "admin", "Admin"
@@ -11,28 +12,37 @@ class UserType(models.TextChoices):
     TESTER = "tester", "Tester"
     OPERATIONS = "operations", "Operations"
 
-class CustomUser(AbstractUser):
+class AccountRole(AbstractUser):
     id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
     )
     mobile = models.CharField(max_length=15,
-                             unique=True
-                             balnk=True,
+                             unique=True,
+                             blank=True,
                              null=True)
-    user_type = models.CharField(max_length=20, choices=UserType.choices, db_index=True)
+    user_type = models.CharField(max_length=20,
+                                choices=UserType.choices,
+                                db_index=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = "accounts"
+    
+    def __str__(self):
+        return self.username or self.email or self.mobile or str(self.id)
 
 
 class AdminProfile(models.Model):
     user = models.OneToOneField(
-        CustomUser,
+        AccountRole,
         on_delete=models.CASCADE,
         related_name="admin_profile",
         limit_choices_to={"user_type": UserType.ADMIN},
     )
     permissions_level = models.CharField(max_length=30, default="admin")
     created_at = models.DateTimeField(auto_now_add=True)
-
-
 
 
 # Otp Model
@@ -45,7 +55,6 @@ class OTP(models.Model):
         from django.utils import timezone
 
         return (timezone.now() - self.created_at).total_seconds() > 300
-
 
 
 #Seller Model
@@ -90,21 +99,10 @@ class SellerProfile(models.Model):
     business_type = models.CharField(max_length=100, blank=True, null=True)
     contact_p_name = models.CharField(max_length=115, blank=True, null=True)
     contact_number = models.CharField(max_length=15, blank=True, null=True)
-
-    # products_category = models.CharField(
-    #     max_length=50, choices=PRODUCT_CATEGORY_CHOICES, blank=True, null=True
-    # )
-
-    # monthly_order = models.CharField(max_length=20, choices=MONTHLY_ORDER_CHOICES, blank=True, null=True)
-
-    # ✅ FIXED FIELD TYPE
-    # average_dispatch = models.CharField(
-    #     max_length=20, choices=DISPATCH_CHOICES, default="same_day"
-    # )
-
+    
+    status = models.BooleanField(default=True, db_index=True)
     commission = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     seller_logo = models.URLField(blank=True, null=True)
-
     approved_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
@@ -119,8 +117,9 @@ class SellerProfile(models.Model):
 
     def __str__(self):
         return self.business_name or ""
+    
 
-    class SellerTaxInformation(models.Model):
+class SellerTaxInformation(models.Model):
         seller = models.OneToOneField(
             SellerProfile,
             on_delete=models.CASCADE,
@@ -132,7 +131,8 @@ class SellerProfile(models.Model):
         name_as_per_pan = models.CharField(max_length=115, blank=True, null=True)
         verified_at = models.DateTimeField(null=True, blank=True)
 
-    class SellerBankAccount(models.Model):
+
+class SellerBankAccount(models.Model):
         seller = models.OneToOneField(
             SellerProfile,
             on_delete=models.CASCADE,
@@ -158,7 +158,7 @@ class SellerProfile(models.Model):
         ]
 
 
-    class SellerAddress(models.Model):
+class SellerAddress(models.Model):
         seller = models.ForeignKey(
             SellerProfile,
             on_delete=models.CASCADE,
@@ -179,28 +179,20 @@ class SellerProfile(models.Model):
         pickup_city = models.CharField(max_length=115, blank=True, null=True)
         pickup_state = models.CharField(max_length=225, blank=True, null=True) 
 
-        class Meta:
-            constraints = [
-            models.UniqueConstraint(
-                fields=["seller", "address_type"],
-                condition=models.Q(is_default=True),
-                name="one_default_seller_address_per_type",
-            ),
-        ] 
+
+class CustomerProfile(models.Model):
+    user = models.OneToOneField(
+        AccountRole,
+        on_delete=models.CASCADE,
+        related_name="customer_profile",
+        limit_choices_to={"user_type": UserType.CUSTOMER},
+    )
+    date_of_birth = models.DateField(blank=True, null=True)
+    gender = models.CharField(max_length=10, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
-    class CustomerProfile(models.Model):
-        user = models.OneToOneField(
-            CustomUser,
-            on_delete=models.CASCADE,
-            related_name="customer_profile",
-            limit_choices_to={"user_type": UserType.CUSTOMER},
-        )
-        date_of_birth = models.DateField(blank=True, null=True)
-        gender = models.CharField(max_length=10, blank=True, null=True)
-        created_at = models.DateTimeField(auto_now_add=True)
-
-    class CustomerAddress(models.Model):
+class CustomerAddress(models.Model):
         customer = models.ForeignKey(
             CustomerProfile,
             on_delete=models.CASCADE,
@@ -208,7 +200,7 @@ class SellerProfile(models.Model):
         )
 
         full_name = models.CharField(max_length=150, blank=True, null=True)
-        mobile = models.CharField(max_length=15, blank=True, null=True)
+        mobile = models.CharField(max_length=15, unique=True, blank=True, null=True)
         address_line1 = models.CharField(max_length=255, blank=True, null=True)
         address_line2 = models.CharField(max_length=255, blank=True, null=True)
         landmark = models.CharField(max_length=255, blank=True, null=True)
@@ -220,13 +212,4 @@ class SellerProfile(models.Model):
         is_default_shiping = models.BooleanField(default=False)
         is_default_billing = models.BooleanField(default=False)
         created_at = models.DateTimeField(auto_now_add=True)
-
-        class Meta:
-            constraints = [
-            models.UniqueConstraint(
-                fields=["customer", "address_type"],
-                condition=models.Q(is_default=True),
-                name="one_default_customer_address_per_type",
-            ),
-        ]
 

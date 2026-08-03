@@ -94,7 +94,7 @@ SIMPLE_JWT = {
 }
 
 ROOT_URLCONF = "CuddlyDuddly.urls"
-AUTH_USER_MODEL = "ApiAdmin.CustomUser"
+AUTH_USER_MODEL = "ApiAdmin.AccountRole"
 
 TEMPLATES = [
     {
@@ -115,8 +115,6 @@ WSGI_APPLICATION = "CuddlyDuddly.wsgi.application"
 
 
 # Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",

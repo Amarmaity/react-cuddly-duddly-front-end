@@ -1,5 +1,5 @@
-import random
-from .models import OTP, SellerProfile, CustomUser
+from django.contrib.auth.models import update_last_login
+from .models import SellerProfile, AccountRole
 from .permissions import IsAdmin
 from rest_framework import status
 from .serializers import (
@@ -50,8 +50,8 @@ def check_admin_users(request):
         mobile = request.query_params.get("mobile", "").strip()
 
         user_exists = (
-            CustomUser.objects.filter(email=email).exists()
-            or CustomUser.objects.filter(mobile=mobile).exists()
+            AccountRole.objects.filter(email=email).exists()
+            or AccountRole.objects.filter(mobile=mobile).exists()
         )
 
         return Response(
@@ -71,6 +71,8 @@ def check_admin_users(request):
             user = serializer.validated_data["user"]
 
             refresh = RefreshToken.for_user(user)
+            
+            update_last_login(None, user)
 
             return Response(
                 {
@@ -131,6 +133,10 @@ def logout_view(request):
         return Response(
             {"success": False, "message": str(e)}, status=status.HTTP_400_BAD_REQUEST
         )
+
+
+
+@api_view()
 
 
 @api_view(["GET", "PUT", "PATCH"])
@@ -196,100 +202,100 @@ def seller_status(request, seller_id):
 # ----------------
 # Send Otp
 # ----------------
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def send_otp(request):
-    mobile = request.data.get("mobile")
+# @api_view(["POST"])
+# @permission_classes([AllowAny])
+# def send_otp(request):
+#     mobile = request.data.get("mobile")
 
-    try:
-        if not mobile:
-            return Response(
-                {"message": "Moile number is requred.", "success": False},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+#     try:
+#         if not mobile:
+#             return Response(
+#                 {"message": "Moile number is requred.", "success": False},
+#                 status=status.HTTP_400_BAD_REQUEST,
+#             )
 
-        user = User.objects.filter(mobile=mobile).first()
+#         user = User.objects.filter(mobile=mobile).first()
 
-        if not user:
-            return Response(
-                {"message": "Invalide mobile number", "success": False},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+#         if not user:
+#             return Response(
+#                 {"message": "Invalide mobile number", "success": False},
+#                 status=status.HTTP_400_BAD_REQUEST,
+#             )
 
-        if not user.is_active:
-            return Response(
-                {"message": "This account is inactive. Please contact admin.", "success": False},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+#         if not user.is_active:
+#             return Response(
+#                 {"message": "This account is inactive. Please contact admin.", "success": False},
+#                 status=status.HTTP_403_FORBIDDEN,
+#             )
 
-        otp = str(random.randint(100000, 999999))
-        # Optional: delete old OTP
-        OTP.objects.filter(mobile=mobile).delete()
-        OTP.objects.create(mobile=mobile, otp=otp)
-        print(f"Otp for {mobile} is {otp}")
+#         otp = str(random.randint(100000, 999999))
+#         # Optional: delete old OTP
+#         OTP.objects.filter(mobile=mobile).delete()
+#         OTP.objects.create(mobile=mobile, otp=otp)
+#         print(f"Otp for {mobile} is {otp}")
 
-        return Response(
-            {"success": True, "otp": otp, "message": "Otp sent successfully."},
-            status=status.HTTP_201_CREATED,
-        )
-    except Exception as e:
-        return Response(
-            {"message": str(e), "success": False}, status=status.HTTP_400_BAD_REQUEST
-        )
+#         return Response(
+#             {"success": True, "otp": otp, "message": "Otp sent successfully."},
+#             status=status.HTTP_201_CREATED,
+#         )
+#     except Exception as e:
+#         return Response(
+#             {"message": str(e), "success": False}, status=status.HTTP_400_BAD_REQUEST
+#         )
 
 
 # ----------------
 # Verify Otp
 # ----------------
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def verify_otp(request):
-    mobile = request.data.get("mobile")
-    otp = request.data.get("otp")
+# @api_view(["POST"])
+# @permission_classes([AllowAny])
+# def verify_otp(request):
+#     mobile = request.data.get("mobile")
+#     otp = request.data.get("otp")
 
-    try:
-        otp_obj = OTP.objects.filter(mobile=mobile).latest("created_at")
+#     try:
+#         otp_obj = OTP.objects.filter(mobile=mobile).latest("created_at")
 
-        if otp_obj.is_expired():
-            return Response(
-                {"error": "OTP expired"}, status=status.HTTP_400_BAD_REQUEST
-            )
+#         if otp_obj.is_expired():
+#             return Response(
+#                 {"error": "OTP expired"}, status=status.HTTP_400_BAD_REQUEST
+#             )
 
-        if otp_obj.otp != otp:
-            return Response(
-                {"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST
-            )
+#         if otp_obj.otp != otp:
+#             return Response(
+#                 {"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST
+#             )
 
-        user = User.objects.get(mobile=mobile)
+#         user = User.objects.get(mobile=mobile)
 
-        if not user.is_active:
-            return Response(
-                {"message": "This account is inactive. Please contact admin.", "success": False},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+#         if not user.is_active:
+#             return Response(
+#                 {"message": "This account is inactive. Please contact admin.", "success": False},
+#                 status=status.HTTP_403_FORBIDDEN,
+#             )
 
-        # 🔥 CREATE JWT TOKEN
-        refresh = RefreshToken.for_user(user)
+#         # 🔥 CREATE JWT TOKEN
+#         refresh = RefreshToken.for_user(user)
 
-        return Response(
-            {
-                "message": "Login Successfull",
-                "token": {"access": str(refresh.access_token), "refresh": str(refresh)},
-                "data": {
-                    "id": user.id,
-                    "username": user.username,
-                    "email": user.email,
-                    "mobile": user.mobile,
-                    "user_type": user.user_type,
-                },
-            },
-            status=status.HTTP_201_CREATED,
-        )
+#         return Response(
+#             {
+#                 "message": "Login Successfull",
+#                 "token": {"access": str(refresh.access_token), "refresh": str(refresh)},
+#                 "data": {
+#                     "id": user.id,
+#                     "username": user.username,
+#                     "email": user.email,
+#                     "mobile": user.mobile,
+#                     "user_type": user.user_type,
+#                 },
+#             },
+#             status=status.HTTP_201_CREATED,
+#         )
 
-    except Exception as e:
-        return Response(
-            {"success": False, "message": str(e)}, status=status.HTTP_400_BAD_REQUEST
-        )
+#     except Exception as e:
+#         return Response(
+#             {"success": False, "message": str(e)}, status=status.HTTP_400_BAD_REQUEST
+#         )
 
 
 

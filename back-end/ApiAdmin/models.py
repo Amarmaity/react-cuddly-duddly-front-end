@@ -1,5 +1,6 @@
 import uuid
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 import django.utils.timezone
@@ -212,4 +213,146 @@ class CustomerAddress(models.Model):
         is_default_shiping = models.BooleanField(default=False)
         is_default_billing = models.BooleanField(default=False)
         created_at = models.DateTimeField(auto_now_add=True)
+
+
+class ModuleChoies(models.TextChoices):
+    DASHBOARD = "dashboard", "Dashboard"
+    ORDERS = "orders", "Orders"
+    PRODUCTS = "products", "Products"
+    CUSTOMERS = "customers", "Customers"
+    REPORTS = "reports", "Reports"
+    SETTINGS = "settings", "Settings"
+    PAYMENTS = "payments", "Payments"
+
+
+class PermissionLevel(models.TextChoices):
+    NONE = "none", "None"
+    VIEW = "view", "View"
+    EDIT = "edit", "Edit"
+    FULL = "full", "Full"
+
+
+class RolePermission(models.Model):
+    """
+    One row per (role, module) pair. This is what the 'click a cell to cycle none
+    -> view -> edit -> > full' UI reads and writes.
+    Seed this table once per role/module combo (a data migration is the
+    cleanest way — see note below)
+    """
+    role = models.CharField(max_length=20, db_index=True)
+    module = models.ChoiceField(max_length=20, choices=ModuleChoies.choices)
+    level = models.CharField(max_length=10, choices=PermissionLevel.choices,
+                              default=PermissionLevel.NONE)
+
+    updated_at = models.ForeignKey(
+        "ApiAdmin.AccountRole",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="updated_permissions",
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "role_permissions"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["role", "module"],
+                name="unique_role_module",
+            ),
+        ]
+    def clear(self):
+        #Admin is always full access — enforce it at the model layer too,
+        # not just in the frontend, so a stray API call can't downgrade it.
+        if self.role == "admin" and self.level != PermissionLevel.FULL:
+            raise ValidationError("Admin permission cannot be reduced below full access.")
+
+    def __str__(self):
+         return f"{self.role} / {self.module}: {self.level}"
+
+
+class SiteMaitenance(models.Model):
+    """
+    Deliberately a singleton (always pk=1). Use SiteMaintenance.load()
+    instead of .objects.get(...) so callers never have to think about
+    whether the row exists yet.
+    """
+    is_enabled = models.BooleanField(default=False)
+    message = models.TextField(blank=True)
+    start_time = models.DateTimeField(blank=True, null=True)
+    end_time = models.DateTimeField(blank=True, null=True)
+    allow_admin_bypass = models.BooleanField(default=True)
+    notify_users = models.BooleanField(default=True)
+
+    udated_by = models.ForeignKey(
+        "ApiAdmin.AccountRole",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="updated_maintenance",
+    )
+
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = "site_maintenance"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1  # Always enforce singleton
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
+
+class SiteSettings(models.Model):
+    app_name = models.CharField(max_length=100, default="Cuddly Dudly")
+    support_email = models.EmailField(blank=True, null=True)
+    support_phone = models.CharField(max_length=15, blank=True, null=True)
+    timezone = models.CharField(max_length=64, default="Asia/Kolkata")
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "site_settings"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1  # Always enforce singleton
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
+
+class ActivityLog(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    actor = models.ForeignKey(
+        "ApiAdmin.AccountRole",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="activity_logs",
+        help_text="Null actor means the action was performed by the system (e.g. a scheduled job).",
+    )
+    action = models.CharField(max_length=255)
+    target_type = models.CharField(max_length=100, blank=True, null=True)
+    target_id = models.CharField(max_length=100, blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        db_table = "activity_logs"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["target_type", "target_id"]),
+        ]
+    def __str__(self):
+        who = self.actor or "System"
+        return f"{who}: {self.action}"
 

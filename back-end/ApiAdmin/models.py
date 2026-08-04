@@ -240,16 +240,15 @@ class RolePermission(models.Model):
     cleanest way — see note below)
     """
     role = models.CharField(max_length=20, db_index=True)
-    module = models.ChoiceField(max_length=20, choices=ModuleChoies.choices)
+    module = models.CharField(max_length=20, choices=ModuleChoies.choices)
     level = models.CharField(max_length=10, choices=PermissionLevel.choices,
                               default=PermissionLevel.NONE)
 
-    updated_at = models.ForeignKey(
+    updated_by = models.ForeignKey(
         "ApiAdmin.AccountRole",
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
         related_name="updated_permissions",
     )
     updated_at = models.DateTimeField(auto_now=True)
@@ -272,7 +271,7 @@ class RolePermission(models.Model):
          return f"{self.role} / {self.module}: {self.level}"
 
 
-class SiteMaitenance(models.Model):
+class SiteMaintenance(models.Model):
     """
     Deliberately a singleton (always pk=1). Use SiteMaintenance.load()
     instead of .objects.get(...) so callers never have to think about
@@ -285,7 +284,7 @@ class SiteMaitenance(models.Model):
     allow_admin_bypass = models.BooleanField(default=True)
     notify_users = models.BooleanField(default=True)
 
-    udated_by = models.ForeignKey(
+    updated_by = models.ForeignKey(
         "ApiAdmin.AccountRole",
         on_delete=models.SET_NULL,
         null=True,

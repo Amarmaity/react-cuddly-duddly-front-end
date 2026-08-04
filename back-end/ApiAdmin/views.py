@@ -335,3 +335,8 @@ def all_sellers(request):
         return Response(
             {"success": False, "message": str(e)}, status=status.HTTP_400_BAD_REQUEST
         )
+
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated, IsAdmin])

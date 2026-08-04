@@ -3,7 +3,13 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.settings import api_settings
 from django.contrib.auth import get_user_model
-from ApiAdmin.models import AdminProfile, SellerProfile
+from ApiAdmin.models import (AdminProfile,
+                            SellerProfile,
+                            RolePermission,
+                            SiteMaintenance,
+                            ActivityLog,
+                            PermissionLevel)
+
 
 User = get_user_model()
 
@@ -384,3 +390,10 @@ class AdminSellerDetailSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+
+class RolePermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RolePermission,
+        fields = ["permissions_level"]

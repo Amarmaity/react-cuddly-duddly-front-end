@@ -394,6 +394,39 @@ class AdminSellerDetailSerializer(serializers.ModelSerializer):
 
 
 class RolePermissionSerializer(serializers.ModelSerializer):
+
+    module_display = serializers.CharField(
+        source = "get_module_display", read_only=True
+    )
+
+    level_display = serializers.CharField(source="get_level_display", read_only=True)
+    updated_by_name = serializers.SerializerMethodField()
+
     class Meta:
         model = RolePermission,
-        fields = ["permissions_level"]
+        fields = [
+            "id",
+            "role",
+            "module",
+            "module_display",
+            "level",
+            "level_disolay"
+            "updated_by",
+            "updated_by_name",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "updated_by", "updated_by_name", "updated_at"]
+
+        def get_updated_by_name(self, obj):
+            if not obj.updated_by:
+                return None
+            
+            return str(obj.updated_by)
+
+        def validate(self, attrs):
+           role = attrs.get("role", getattr(self.instance, "role", None))
+           level = attrs.get("level", getattr(self.instance, "level", None))
+
+           if role == "admin" and level != PermissionLevel.FULL:
+               raise serializers.ValidationError({"level": "Admin permission cannot be reduced below full access>"})
+           return attrs
